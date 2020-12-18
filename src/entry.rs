@@ -487,7 +487,7 @@ where
     #[cfg(not(feature = "indexmap"))] // TODO
     pub fn replace_entry(self, value: V) -> (K, V) {
         match self.0 {
-            OccupiedEntryInt::Map(mut m) => m.replace_entry(value),
+            OccupiedEntryInt::Map(m) => m.replace_entry(value),
             OccupiedEntryInt::Vec(m) => m.replace_entry(value),
         }
     }
