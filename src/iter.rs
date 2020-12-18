@@ -1,6 +1,9 @@
 use super::{HashMap, HashMapInt};
 use core::hash::{BuildHasher, Hash};
-use hashbrown;
+#[cfg(not(feature = "indexmap"))]
+use hashbrown::hash_map;
+#[cfg(feature = "indexmap")]
+use indexmap::map as hash_map;
 use std::iter::{FromIterator, IntoIterator};
 
 /// Iterator over the key value pairs of a Halfbrown map
@@ -12,7 +15,7 @@ impl<'a, K, V> From<IterInt<'a, K, V>> for Iter<'a, K, V> {
     }
 }
 pub(crate) enum IterInt<'a, K, V> {
-    Map(hashbrown::hash_map::Iter<'a, K, V>),
+    Map(hash_map::Iter<'a, K, V>),
     Vec(std::slice::Iter<'a, (K, V)>),
 }
 
@@ -43,7 +46,10 @@ impl<'a, K, V> Iterator for Iter<'a, K, V> {
 /// Into iterator for a Halfbrown map
 pub struct IntoIter<K, V>(IntoIterInt<K, V>);
 enum IntoIterInt<K, V> {
+    #[cfg(not(feature = "indexmap"))]
     Map(hashbrown::hash_map::IntoIter<K, V>),
+    #[cfg(feature = "indexmap")]
+    Map(indexmap::map::IntoIter<K, V>),
     Vec(std::vec::IntoIter<(K, V)>),
 }
 impl<K, V> IntoIter<K, V> {
@@ -134,7 +140,10 @@ impl<'a, K, V> From<IterMutInt<'a, K, V>> for IterMut<'a, K, V> {
 }
 
 pub(crate) enum IterMutInt<'a, K, V> {
+    #[cfg(not(feature = "indexmap"))]
     Map(hashbrown::hash_map::IterMut<'a, K, V>),
+    #[cfg(feature = "indexmap")]
+    Map(indexmap::map::IterMut<'a, K, V>),
     Vec(std::slice::IterMut<'a, (K, V)>),
 }
 

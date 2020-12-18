@@ -1,7 +1,10 @@
 // based on / take from <https://github.com/rust-lang/hashbrown/blob/62a1ae24d4678fcbf777bef6b205fadeecb781d9/src/map.rs>
 
+#[cfg(not(feature = "indexmap"))]
 use super::*;
+#[cfg(not(feature = "indexmap"))]
 use crate::vecmap;
+#[cfg(not(feature = "indexmap"))]
 use hashbrown::hash_map;
 /*
 use std::fmt::{self, Debug};
@@ -13,8 +16,10 @@ use std::mem;
 /// See the [`HashMap::raw_entry_mut`] docs for usage examples.
 ///
 /// [`HashMap::raw_entry_mut`]: struct.HashMap.html#method.raw_entry_mut
+#[cfg(not(feature = "indexmap"))]
 pub struct RawEntryBuilderMut<'a, K, V, S>(RawEntryBuilderMutInt<'a, K, V, S>);
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> From<hash_map::RawEntryBuilderMut<'a, K, V, S>>
     for RawEntryBuilderMut<'a, K, V, S>
 {
@@ -23,6 +28,7 @@ impl<'a, K, V, S> From<hash_map::RawEntryBuilderMut<'a, K, V, S>>
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> From<vecmap::RawEntryBuilderMut<'a, K, V, S>> for RawEntryBuilderMut<'a, K, V, S>
 where
     S: BuildHasher,
@@ -31,6 +37,7 @@ where
         Self(RawEntryBuilderMutInt::Vec(m))
     }
 }
+#[cfg(not(feature = "indexmap"))]
 enum RawEntryBuilderMutInt<'a, K, V, S> {
     Vec(vecmap::RawEntryBuilderMut<'a, K, V, S>),
     Map(hash_map::RawEntryBuilderMut<'a, K, V, S>),
@@ -47,6 +54,7 @@ enum RawEntryBuilderMutInt<'a, K, V, S> {
 /// [`Entry`]: enum.Entry.html
 /// [`raw_entry_mut`]: struct.HashMap.html#method.raw_entry_mut
 /// [`RawEntryBuilderMut`]: struct.RawEntryBuilderMut.html
+#[cfg(not(feature = "indexmap"))]
 pub enum RawEntryMut<'a, K, V, S> {
     /// An occupied entry.
     Occupied(RawOccupiedEntryMut<'a, K, V, S>),
@@ -54,6 +62,7 @@ pub enum RawEntryMut<'a, K, V, S> {
     Vacant(RawVacantEntryMut<'a, K, V, S>),
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> From<vecmap::RawEntryMut<'a, K, V, S>> for RawEntryMut<'a, K, V, S> {
     fn from(e: vecmap::RawEntryMut<'a, K, V, S>) -> Self {
         match e {
@@ -63,6 +72,7 @@ impl<'a, K, V, S> From<vecmap::RawEntryMut<'a, K, V, S>> for RawEntryMut<'a, K, 
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> From<hash_map::RawEntryMut<'a, K, V, S>> for RawEntryMut<'a, K, V, S> {
     fn from(e: hash_map::RawEntryMut<'a, K, V, S>) -> Self {
         match e {
@@ -76,8 +86,10 @@ impl<'a, K, V, S> From<hash_map::RawEntryMut<'a, K, V, S>> for RawEntryMut<'a, K
 /// It is part of the [`RawEntryMut`] enum.
 ///
 /// [`RawEntryMut`]: enum.RawEntryMut.html
+#[cfg(not(feature = "indexmap"))]
 pub struct RawOccupiedEntryMut<'a, K, V, S>(RawOccupiedEntryMutInt<'a, K, V, S>);
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> From<vecmap::RawOccupiedEntryMut<'a, K, V, S>>
     for RawOccupiedEntryMut<'a, K, V, S>
 {
@@ -86,6 +98,7 @@ impl<'a, K, V, S> From<vecmap::RawOccupiedEntryMut<'a, K, V, S>>
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> From<hash_map::RawOccupiedEntryMut<'a, K, V>>
     for RawOccupiedEntryMut<'a, K, V, S>
 {
@@ -94,6 +107,7 @@ impl<'a, K, V, S> From<hash_map::RawOccupiedEntryMut<'a, K, V>>
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 unsafe impl<K, V, S> Send for RawOccupiedEntryMut<'_, K, V, S>
 where
     K: Send,
@@ -102,6 +116,7 @@ where
 {
 }
 
+#[cfg(not(feature = "indexmap"))]
 unsafe impl<K, V, S> Sync for RawOccupiedEntryMut<'_, K, V, S>
 where
     K: Sync,
@@ -110,11 +125,13 @@ where
 {
 }
 
+#[cfg(not(feature = "indexmap"))]
 enum RawOccupiedEntryMutInt<'a, K, V, S> {
     Vec(vecmap::RawOccupiedEntryMut<'a, K, V, S>),
     Map(hash_map::RawOccupiedEntryMut<'a, K, V>),
 }
 
+#[cfg(not(feature = "indexmap"))]
 unsafe impl<K, V, S> Send for RawOccupiedEntryMutInt<'_, K, V, S>
 where
     K: Send,
@@ -122,6 +139,7 @@ where
     S: Send,
 {
 }
+#[cfg(not(feature = "indexmap"))]
 unsafe impl<K, V, S> Sync for RawOccupiedEntryMutInt<'_, K, V, S>
 where
     K: Sync,
@@ -134,14 +152,17 @@ where
 /// It is part of the [`RawEntryMut`] enum.
 ///
 /// [`RawEntryMut`]: enum.RawEntryMut.html
+#[cfg(not(feature = "indexmap"))]
 pub struct RawVacantEntryMut<'a, K, V, S>(RawVacantEntryMutInt<'a, K, V, S>);
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> From<vecmap::RawVacantEntryMut<'a, K, V, S>> for RawVacantEntryMut<'a, K, V, S> {
     fn from(m: vecmap::RawVacantEntryMut<'a, K, V, S>) -> Self {
         Self(RawVacantEntryMutInt::Vec(m))
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> From<hash_map::RawVacantEntryMut<'a, K, V, S>>
     for RawVacantEntryMut<'a, K, V, S>
 {
@@ -150,6 +171,7 @@ impl<'a, K, V, S> From<hash_map::RawVacantEntryMut<'a, K, V, S>>
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 enum RawVacantEntryMutInt<'a, K, V, S> {
     Vec(vecmap::RawVacantEntryMut<'a, K, V, S>),
     Map(hash_map::RawVacantEntryMut<'a, K, V, S>),
@@ -161,25 +183,30 @@ enum RawVacantEntryMutInt<'a, K, V, S> {
 ///
 /// [`HashMap::raw_entry`]: struct.HashMap.html#method.raw_entry
 ///
+#[cfg(not(feature = "indexmap"))]
 pub struct RawEntryBuilder<'a, K, V, S>(RawEntryBuilderInt<'a, K, V, S>);
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> From<hash_map::RawEntryBuilder<'a, K, V, S>> for RawEntryBuilder<'a, K, V, S> {
     fn from(m: hash_map::RawEntryBuilder<'a, K, V, S>) -> Self {
         Self(RawEntryBuilderInt::Map(m))
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> From<vecmap::RawEntryBuilder<'a, K, V, S>> for RawEntryBuilder<'a, K, V, S> {
     fn from(m: vecmap::RawEntryBuilder<'a, K, V, S>) -> Self {
         Self(RawEntryBuilderInt::Vec(m))
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 enum RawEntryBuilderInt<'a, K, V, S> {
     Vec(vecmap::RawEntryBuilder<'a, K, V, S>),
     Map(hash_map::RawEntryBuilder<'a, K, V, S>),
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> RawEntryBuilderMut<'a, K, V, S>
 where
     S: BuildHasher,
@@ -213,6 +240,7 @@ where
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> RawEntryBuilderMut<'a, K, V, S>
 where
     S: BuildHasher,
@@ -231,6 +259,7 @@ where
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> RawEntryBuilder<'a, K, V, S>
 where
     S: BuildHasher,
@@ -277,6 +306,7 @@ where
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> RawEntryMut<'a, K, V, S>
 where
     S: BuildHasher,
@@ -418,6 +448,7 @@ where
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> RawOccupiedEntryMut<'a, K, V, S>
 where
     S: BuildHasher,
@@ -543,6 +574,7 @@ where
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> RawVacantEntryMut<'a, K, V, S>
 where
     S: BuildHasher,
@@ -596,12 +628,14 @@ where
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<K, V, S> Debug for RawEntryBuilderMut<'_, K, V, S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("RawEntryBuilder").finish()
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<K: Debug, V: Debug, S> Debug for RawEntryMut<'_, K, V, S>
 where
     S: BuildHasher,
@@ -614,6 +648,7 @@ where
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<K: Debug, V: Debug, S> Debug for RawOccupiedEntryMut<'_, K, V, S>
 where
     S: BuildHasher,
@@ -626,12 +661,14 @@ where
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<K, V, S> Debug for RawVacantEntryMut<'_, K, V, S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("RawVacantEntryMut").finish()
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<K, V, S> Debug for RawEntryBuilder<'_, K, V, S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("RawEntryBuilder").finish()

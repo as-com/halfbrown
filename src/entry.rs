@@ -4,9 +4,14 @@
 
 use crate::vecmap::{self, Entry as VecMapEntry};
 use core::hash::{BuildHasher, Hash};
+#[cfg(not(feature = "indexmap"))]
 use hashbrown::{
     self,
     hash_map::{self, Entry as HashBrownEntry},
+};
+#[cfg(feature = "indexmap")]
+use indexmap::{
+    map::{self as hash_map, Entry as HashBrownEntry}
 };
 use std::fmt;
 
@@ -141,11 +146,25 @@ where
     }
 }
 
+#[cfg(not(feature = "indexmap"))]
 impl<'a, K, V, S> From<HashBrownEntry<'a, K, V, S>> for Entry<'a, K, V, S>
 where
     S: BuildHasher,
 {
     fn from(f: HashBrownEntry<'a, K, V, S>) -> Entry<'a, K, V, S> {
+        match f {
+            HashBrownEntry::Occupied(o) => Entry::Occupied(OccupiedEntry(OccupiedEntryInt::Map(o))),
+            HashBrownEntry::Vacant(o) => Entry::Vacant(VacantEntry(VacantEntryInt::Map(o))),
+        }
+    }
+}
+
+#[cfg(feature = "indexmap")]
+impl<'a, K, V, S> From<HashBrownEntry<'a, K, V>> for Entry<'a, K, V, S>
+where
+    S: BuildHasher,
+{
+    fn from(f: HashBrownEntry<'a, K, V>) -> Entry<'a, K, V, S> {
         match f {
             HashBrownEntry::Occupied(o) => Entry::Occupied(OccupiedEntry(OccupiedEntryInt::Map(o))),
             HashBrownEntry::Vacant(o) => Entry::Vacant(VacantEntry(VacantEntryInt::Map(o))),
@@ -189,7 +208,10 @@ enum OccupiedEntryInt<'a, K, V, S>
 where
     S: BuildHasher,
 {
+    #[cfg(not(feature = "indexmap"))]
     Map(hash_map::OccupiedEntry<'a, K, V, S>),
+    #[cfg(feature = "indexmap")]
+    Map(hash_map::OccupiedEntry<'a, K, V>),
     Vec(vecmap::OccupiedEntry<'a, K, V, S>),
 }
 
@@ -233,7 +255,10 @@ where
     S: BuildHasher,
 {
     /// a map based implementation
+    #[cfg(not(feature = "indexmap"))]
     Map(hashbrown::hash_map::VacantEntry<'a, K, V, S>),
+    #[cfg(feature = "indexmap")]
+    Map(indexmap::map::VacantEntry<'a, K, V>),
     /// a vec based implementation
     Vec(vecmap::VacantEntry<'a, K, V, S>),
 }
@@ -459,9 +484,10 @@ where
     ///
     /// ```
     #[inline]
+    #[cfg(not(feature = "indexmap"))] // TODO
     pub fn replace_entry(self, value: V) -> (K, V) {
         match self.0 {
-            OccupiedEntryInt::Map(m) => m.replace_entry(value),
+            OccupiedEntryInt::Map(mut m) => m.replace_entry(value),
             OccupiedEntryInt::Vec(m) => m.replace_entry(value),
         }
     }
@@ -491,6 +517,7 @@ where
     /// }
     /// ```
     #[inline]
+    #[cfg(not(feature = "indexmap"))] // TODO
     pub fn replace_key(self) -> K {
         match self.0 {
             OccupiedEntryInt::Map(m) => m.replace_key(),

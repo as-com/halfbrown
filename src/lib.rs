@@ -19,6 +19,7 @@
 //! their copyright.
 
 #![forbid(warnings)]
+#![allow(dead_code)]
 #![warn(unused_extern_crates)]
 #![cfg_attr(
     feature = "cargo-clippy",
@@ -47,15 +48,24 @@ pub use crate::raw_entry::*;
 use crate::vecmap::VecMap;
 use core::borrow::Borrow;
 use core::hash::{BuildHasher, Hash};
+#[cfg(not(feature = "indexmap"))]
 use hashbrown::{self, HashMap as HashBrown};
+#[cfg(feature = "indexmap")]
+use indexmap::IndexMap as HashBrown;
+
 use std::default::Default;
 use std::fmt::{self, Debug};
 use std::ops::Index;
 
+#[cfg(not(feature = "indexmap"))]
 #[cfg(feature = "fxhash")]
 pub use fxhash::FxBuildHasher as DefaultHashBuilder;
+#[cfg(not(feature = "indexmap"))]
 #[cfg(not(feature = "fxhash"))]
 pub use hashbrown::hash_map::DefaultHashBuilder;
+
+#[cfg(feature = "indexmap")]
+use ahash::RandomState as DefaultHashBuilder;
 
 /// Maximum nymber of elements before the representaiton is swapped from
 /// Vec to `HashMap`
@@ -444,7 +454,10 @@ impl<K, V, S> HashMap<K, V, S> {
     #[inline]
     pub fn drain(&mut self) -> Drain<K, V> {
         match &mut self.0 {
+            #[cfg(not(feature = "indexmap"))]
             HashMapInt::Map(m) => Drain(DrainInt::Map(m.drain())),
+            #[cfg(feature = "indexmap")]
+            HashMapInt::Map(m) => Drain(DrainInt::Map(m.drain(std::ops::RangeFull))),
             HashMapInt::Vec(m) => Drain(DrainInt::Vec(m.drain())),
             HashMapInt::None => unreachable!(),
         }
@@ -855,6 +868,7 @@ where
     /// acting erratically, with two keys randomly masking each other. Implementations
     /// are free to assume this doesn't happen (within the limits of memory-safety).
     #[inline]
+    #[cfg(not(feature = "indexmap"))]
     pub fn raw_entry_mut(&mut self) -> RawEntryBuilderMut<'_, K, V, S> {
         match &mut self.0 {
             HashMapInt::Vec(m) => RawEntryBuilderMut::from(m.raw_entry_mut()),
@@ -879,6 +893,7 @@ where
     ///
     /// Immutable raw entries have very limited use; you might instead want `raw_entry_mut`.
     #[inline]
+    #[cfg(not(feature = "indexmap"))]
     pub fn raw_entry(&self) -> RawEntryBuilder<'_, K, V, S> {
         match &self.0 {
             HashMapInt::Vec(m) => RawEntryBuilder::from(m.raw_entry()),
@@ -914,7 +929,7 @@ impl<'a, K, V> Iterator for Keys<'a, K, V> {
     type Item = &'a K;
 
     #[inline]
-    fn next(&mut self) -> Option<(&'a K)> {
+    fn next(&mut self) -> Option<&'a K> {
         self.inner.next().map(|(k, _)| k)
     }
     #[inline]
@@ -932,7 +947,7 @@ impl<'a, K, V> Iterator for Values<'a, K, V> {
     type Item = &'a V;
 
     #[inline]
-    fn next(&mut self) -> Option<(&'a V)> {
+    fn next(&mut self) -> Option<&'a V> {
         self.inner.next().map(|(_, v)| v)
     }
     #[inline]
@@ -951,7 +966,7 @@ impl<'a, K, V> Iterator for ValuesMut<'a, K, V> {
     type Item = &'a mut V;
 
     #[inline]
-    fn next(&mut self) -> Option<(&'a mut V)> {
+    fn next(&mut self) -> Option<&'a mut V> {
         self.inner.next().map(|(_, v)| v)
     }
     #[inline]
@@ -964,7 +979,10 @@ impl<'a, K, V> Iterator for ValuesMut<'a, K, V> {
 pub struct Drain<'a, K, V>(DrainInt<'a, K, V>);
 
 enum DrainInt<'a, K, V> {
+    #[cfg(not(feature = "indexmap"))]
     Map(hashbrown::hash_map::Drain<'a, K, V>),
+    #[cfg(feature = "indexmap")]
+    Map(indexmap::map::Drain<'a, K, V>),
     Vec(std::vec::Drain<'a, (K, V)>),
 }
 
