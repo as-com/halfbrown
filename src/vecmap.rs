@@ -141,6 +141,11 @@ impl<K, V, S> VecMap<K, V, S> {
     }
 
     #[inline]
+    pub(crate) fn swap_indices(&mut self, a: usize, b: usize) {
+        self.v.swap(a, b);
+    }
+
+    #[inline]
     pub(crate) fn insert_nocheck(&mut self, k: K, v: V) {
         self.v.push((k, v));
     }
@@ -165,6 +170,30 @@ impl<K, V, S> VecMap<K, V, S> {
         for (ak, v) in &self.v {
             if k == ak.borrow() {
                 return Some(&v);
+            }
+        }
+        None
+    }
+
+    #[inline]
+    pub(crate) fn get_index(&self, index: usize) -> Option<(&K, &V)> {
+        if index >= self.len() {
+            return None
+        }
+
+        let e = &self.v[index];
+        Some((&e.0, &e.1))
+    }
+
+    #[inline]
+    pub(crate) fn get_index_of<Q: ?Sized>(&self, k: &Q) -> Option<usize>
+    where
+        K: Borrow<Q>,
+        Q: Eq,
+    {
+        for (i, (ak, _)) in self.v.iter().enumerate() {
+            if k == ak.borrow() {
+                return Some(i);
             }
         }
         None
@@ -196,6 +225,16 @@ impl<K, V, S> VecMap<K, V, S> {
             }
         }
         None
+    }
+
+    #[inline]
+    pub(crate) fn get_index_mut(&mut self, index: usize) -> Option<(&mut K, &mut V)> {
+        if index >= self.len() {
+            return None
+        }
+
+        let e = &mut self.v[index];
+        Some((&mut e.0, &mut e.1))
     }
 
     /// Creates a raw entry builder for the HashMap.

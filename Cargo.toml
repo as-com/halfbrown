@@ -11,7 +11,7 @@ repository = "https://github.com/Licenser/halfbrown"
 hashbrown = "0.9"
 serde = { version = "1", default-features = false,  optional = true }
 fxhash =  { version = "0.2",  optional = true }
-indexmap = { version = "1.6", optional = true, dependencies = ["ahash"] }
+indexmap = { version = "1.6", optional = true }
 ahash = { version = "0.6", optional = true }
 
 [dev-dependencies]

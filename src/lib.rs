@@ -626,6 +626,30 @@ where
         }
     }
 
+    /// Get a key-value pair by index
+    /// 
+    /// Valid indices are 0 <= index < self.len()
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use halfbrown::HashMap;
+    ///
+    /// let mut map = HashMap::new();
+    /// map.insert(1, "a");
+    /// assert_eq!(map.get_index(0), Some((&1, &"a")));
+    /// assert_eq!(map.get_index(1), None);
+    /// ```
+    #[inline]
+    #[cfg(feature = "indexmap")]
+    pub fn get_index(&self, index: usize) -> Option<(&K, &V)> {
+        match &self.0 {
+            HashMapInt::Map(m) => m.get_index(index),
+            HashMapInt::Vec(m) => m.get_index(index),
+            HashMapInt::None => unreachable!(),
+        }
+    }
+
     /// Returns `true` if the map contains a value for the specified key.
     ///
     /// The key may be any borrowed form of the map's key type, but
@@ -688,6 +712,61 @@ where
         match &mut self.0 {
             HashMapInt::Map(m) => m.get_mut(k),
             HashMapInt::Vec(m) => m.get_mut(k),
+            HashMapInt::None => unreachable!(),
+        }
+    }
+
+    /// Get a key-value pair by index
+    /// 
+    /// Valid indices are 0 <= index < self.len()
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use halfbrown::HashMap;
+    ///
+    /// let mut map = HashMap::new();
+    /// map.insert(1, "a");
+    /// if let Some((k, x)) = map.get_index_mut(0) {
+    ///     *k = 2;
+    ///     *x = "b";
+    /// }
+    /// assert_eq!(map[&2], "b");
+    /// ```
+    #[inline]
+    #[cfg(feature = "indexmap")]
+    pub fn get_index_mut(&mut self, index: usize) -> Option<(&mut K, &mut V)> {
+        match &mut self.0 {
+            HashMapInt::Map(m) => m.get_index_mut(index),
+            HashMapInt::Vec(m) => m.get_index_mut(index),
+            HashMapInt::None => unreachable!(),
+        }
+    }
+
+    /// Return item index, if it exists in the map
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use halfbrown::HashMap;
+    /// 
+    /// let mut map = HashMap::new();
+    /// map.insert(2, "a");
+    /// map.insert(1, "b");
+    /// assert_eq!(map.get_index_of(&1), Some(1));
+    /// assert_eq!(map.get_index_of(&2), Some(0));
+    /// assert_eq!(map.get_index_of(&3), None);
+    /// ```
+    #[inline]
+    #[cfg(feature = "indexmap")]
+    pub fn get_index_of<Q: ?Sized>(&self, k: &Q) -> Option<usize>
+    where
+        K: Borrow<Q>,
+        Q: Hash + Eq,
+    {
+        match &self.0 {
+            HashMapInt::Map(m) => m.get_index_of(k),
+            HashMapInt::Vec(m) => m.get_index_of(k),
             HashMapInt::None => unreachable!(),
         }
     }
@@ -773,6 +852,31 @@ where
         match &mut self.0 {
             HashMapInt::Map(m) => m.remove(k),
             HashMapInt::Vec(m) => m.remove(k),
+            HashMapInt::None => unreachable!(),
+        }
+    }
+
+    /// Swaps the position of two key-value pairs in the map.
+    /// 
+    /// **Panics** if `a` or `b` are out of bounds.
+    ///
+    /// # Examples
+    /// 
+    /// ```
+    /// use halfbrown::HashMap;
+    /// 
+    /// let mut map = HashMap::new();
+    /// map.insert(2, "a");
+    /// map.insert(1, "b");
+    /// map.swap_indices(0, 1);
+    /// assert_eq!(map.get_index(0), Some((&1, &"b")));
+    /// assert_eq!(map.get_index(1), Some((&2, &"a")));
+    #[inline]
+    #[cfg(feature = "indexmap")]
+    pub fn swap_indices(&mut self, a: usize, b: usize) {
+        match &mut self.0 {
+            HashMapInt::Map(m) => m.swap_indices(a, b),
+            HashMapInt::Vec(m) => m.swap_indices(a, b),
             HashMapInt::None => unreachable!(),
         }
     }
