@@ -8,11 +8,11 @@ description = "Multi backend HashMap for higher performance on different key spa
 repository = "https://github.com/Licenser/halfbrown"
 
 [dependencies]
-hashbrown = "0.9"
+hashbrown = { git = "https://github.com/rust-lang/hashbrown.git", branch = "master", features = ["inline-more", "nightly"] }
 serde = { version = "1", default-features = false,  optional = true }
 fxhash =  { version = "0.2",  optional = true }
 indexmap = { version = "1.6", optional = true }
-ahash = { version = "0.6", optional = true }
+ahash = { version = "0.7", optional = true }
 
 [dev-dependencies]
 criterion = "0.3"
