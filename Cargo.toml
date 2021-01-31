@@ -17,6 +17,8 @@ ahash = { version = "0.7", optional = true }
 [dev-dependencies]
 criterion = "0.3"
 
+[patch.crates-io]
+hashbrown = { git = "https://github.com/rust-lang/hashbrown.git", branch = "master", features = ["inline-more", "nightly"] }
 
 [features]
 default = []
